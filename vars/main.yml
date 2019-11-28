@@ -1,0 +1,4 @@
+ql_url: https://beta.quicklisp.org/quicklisp.lisp
+working_directory: /usr/local/src/quicklisp
+user_name: builder
+user_home: "/home/{{ user_name }}"

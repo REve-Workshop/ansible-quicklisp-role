@@ -1,0 +1,51 @@
+#+TITLE: QuickLisp Installation Ansible Role
+
+* WARNING
+  :PROPERTIES:
+  :ID:       4ff7444d-0f05-47c7-a7ed-dd20caef6f0c
+  :END:
+  Do not rely on the code blindly, it as not been tested yet.
+* Introduction
+  :PROPERTIES:
+  :ID:       8d155b05-4cd0-46cb-b321-deb33c4a3128
+  :END:
+  This Ansible role allows to install or update an existing QuickLisp
+  application.
+
+  This role expects:
+  - The SBCL Common Lisp implementation to be installed.
+  - The target to have an access to the repositories containing the
+    sources of quicklips and/or the packages available through it.
+* Installation
+  :PROPERTIES:
+  :ID:       cf3ebfbf-8a49-4a1d-8baa-d54e5fa6276f
+  :END:
+  Add this repository as a role directory inside an existing ansible
+  project.
+* Usage
+  :PROPERTIES:
+  :ID:       08a79ef9-17ef-4e47-9f26-b60611e6ba68
+  :END:
+  The following variables can be overloaded in your playbook:
+  - =ql_url=, the URL of the quicklisp source file. [Default:
+    [[https://beta.quicklisp.org/quicklisp.lisp]]]
+  - =working_dir=, the working directory where to download the source. [Default: /usr/local/src/quicklisp]
+  - =user_name=: The user to impersonate to install/update quicklisp and the Common Lisp packages. [Default: builder].
+  - =user_home=: The user home directory. [Default: =/home/{{ user_name }}=].
+
+  The role is to be execute as the root user on the target hosts.
+** Example playbook
+   :PROPERTIES:
+   :ID:       dd28ff5c-cb3a-462b-b259-f471e6892b96
+   :END:
+   #+begin_example
+     ---
+     - host: all
+       gather_facts: False
+       tasks:
+         - name: Deploy QuickLisp
+           include_role:
+             name: quicklisp
+           vars:
+             working_directory: "/var/lib/src/git_repos/ql"
+   #+end_example

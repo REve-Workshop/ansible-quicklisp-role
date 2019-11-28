@@ -1,0 +1,33 @@
+- name: Ensure a directory exist for the quicklisp sources
+  file:
+    path: "{{ working_directory }}"
+    state: directory
+- name: Download Quicklisp
+  get_url:
+    url: "{{ ql_url }}"
+    dest: "{{ working_directory }}"
+- name: QuickLisp setup
+  block:
+    - name: Update quicklisp
+      command: "sbcl --disable-debugger --eval \"(progn (ql:update-client) (exit))\""
+      register: ql_res
+    - name: Initialize Quicklisp
+      block:
+        - name: Install quicklisp client
+          command: "sbcl --disable-debugger --load {{ working_directory }}/quicklisp.lisp --eval \"(progn (quicklisp-quickstart:install) (exit))\""
+        # It is necessary to patch this file, else, the command in the
+        # next task will ask for pressing enter (Ansible doesn't
+        # manage interactive applications, AFAIK).
+        - name: Patch quicklisp/quicklisp/impl-util.lisp
+          lineinfile:
+            line: "(when (eq 1 1)"
+            regexp: "\\(ql-util:press-enter-to-continue\\)"
+            path: "{{ user_home }}/quicklisp/quicklisp/impl-util.lisp"
+            state: present
+        - name: Ensure quicklisp is automatically loaded
+          command: "sbcl --disable-debugger --load {{ user_home }}/quicklisp/setup.lisp --eval \"(progn (ql:add-to-init-file) (exit))\""
+      when: ql_res.rc != 0
+    - name: Update common lisp packages
+      command: 'sbcl --disable-debugger --eval "(progn (ql:update-dist \"quicklisp\") (exit))"'
+  become: True
+  become_user: "{{ user_name }}"
