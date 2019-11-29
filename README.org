@@ -1,4 +1,4 @@
-#+TITLE: QuickLisp Installation Ansible Role
+#+TITLE: Ansible Role for QuickLisp Installation
 
 * WARNING
   :PROPERTIES:
@@ -9,7 +9,7 @@
   :PROPERTIES:
   :ID:       8d155b05-4cd0-46cb-b321-deb33c4a3128
   :END:
-  This Ansible role allows to install or update an existing QuickLisp
+  This Ansible role allows to install or update the QuickLisp
   application.
 
   This role expects:
@@ -29,9 +29,12 @@
   The following variables can be overloaded in your playbook:
   - =ql_url=, the URL of the quicklisp source file. [Default:
     [[https://beta.quicklisp.org/quicklisp.lisp]]]
-  - =working_dir=, the working directory where to download the source. [Default: /usr/local/src/quicklisp]
-  - =user_name=: The user to impersonate to install/update quicklisp and the Common Lisp packages. [Default: builder].
-  - =user_home=: The user home directory. [Default: =/home/{{ user_name }}=].
+  - =working_dir=, the working directory where to download the
+    source. [Default: =/usr/local/src/quicklisp= ]
+  - =user_name=: The user to impersonate to install/update quicklisp
+    and the Common Lisp packages. [Default: =builder= ].
+  - =user_home=: The user home directory. [Default: =/home/{{
+    user_name }}= ].
 
   The role is to be execute as the root user on the target hosts.
 ** Example playbook
