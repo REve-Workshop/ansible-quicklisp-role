@@ -1,10 +1,5 @@
 #+TITLE: Ansible Role for QuickLisp Installation
 
-* WARNING
-  :PROPERTIES:
-  :ID:       4ff7444d-0f05-47c7-a7ed-dd20caef6f0c
-  :END:
-  Do not rely on the code blindly, it as not been tested yet.
 * Introduction
   :PROPERTIES:
   :ID:       8d155b05-4cd0-46cb-b321-deb33c4a3128
@@ -15,7 +10,7 @@
   This role expects:
   - The SBCL Common Lisp implementation to be installed.
   - The target to have an access to the repositories containing the
-    sources of quicklips and/or the packages available through it.
+    sources of quicklisp and/or the packages available through it.
 * Installation
   :PROPERTIES:
   :ID:       cf3ebfbf-8a49-4a1d-8baa-d54e5fa6276f
