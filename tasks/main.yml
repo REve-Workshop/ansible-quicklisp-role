@@ -11,6 +11,7 @@
     - name: Update quicklisp
       command: "sbcl --disable-debugger --eval \"(progn (ql:update-client) (exit))\""
       register: ql_res
+      ignore_errors: yes
     - name: Initialize Quicklisp
       block:
         - name: Install quicklisp client
