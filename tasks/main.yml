@@ -1,3 +1,8 @@
+- name: Include common variables
+  include_vars:
+    file: ../../common/vars/main.yml
+- debug:
+    msg: "User for this Role: {{ user_name }} with home as {{ user_home }}" 
 - name: Ensure a directory exist for the quicklisp sources
   file:
     path: "{{ working_directory }}"
@@ -9,13 +14,26 @@
 - name: QuickLisp setup
   block:
     - name: Update quicklisp
-      command: "sbcl --disable-debugger --eval \"(progn (ql:update-client) (exit))\""
+      command:
+      args:
+        chdir: "{{ user_home }}/"
+        cmd: "sbcl --disable-debugger --eval \"(progn (ql:update-client) (exit))\""
+        removes: "{{ user_home }}/quicklisp"
+      become: True
+      become_user: "{{ user_name }}"
+    - name: Install quicklisp client
+      command:
+      args:
+        chdir: "{{ user_home }}/"
+        cmd: "sbcl --disable-debugger --load {{ working_directory }}/quicklisp.lisp --eval \"(progn (quicklisp-quickstart:install) (exit))\""
+        creates: "{{ user_home }}/quicklisp"
       register: ql_res
-      ignore_errors: yes
+      become: True
+      become_user: "{{ user_name }}"
+    - debug:
+        msg: "Content of ql_res: {{ ql_res }}"
     - name: Initialize Quicklisp
       block:
-        - name: Install quicklisp client
-          command: "sbcl --disable-debugger --load {{ working_directory }}/quicklisp.lisp --eval \"(progn (quicklisp-quickstart:install) (exit))\""
         # It is necessary to patch this file, else, the command in the
         # next task will ask for pressing enter (Ansible doesn't
         # manage interactive applications, AFAIK).
@@ -27,8 +45,11 @@
             state: present
         - name: Ensure quicklisp is automatically loaded
           command: "sbcl --disable-debugger --load {{ user_home }}/quicklisp/setup.lisp --eval \"(progn (ql:add-to-init-file) (exit))\""
-      when: ql_res.rc != 0
+          args:
+            chdir: "{{ user_home }}"
     - name: Update common lisp packages
       command: 'sbcl --disable-debugger --eval "(progn (ql:update-dist \"quicklisp\") (exit))"'
+      args:
+        chdir: "{{ user_home }}"
   become: True
-  become_user: "{{ user_name }}"
+  become_user: user_name
