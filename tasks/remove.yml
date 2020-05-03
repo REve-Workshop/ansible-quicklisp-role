@@ -1,0 +1,8 @@
+- name: Remove the source directory of quicklisp
+  file:
+    path: "{{ working_directory }}"
+    state: absent
+- name: Remove QuickLisp from builder user
+  file:
+    path: "/home/builder/quicklisp"
+    state: absent
