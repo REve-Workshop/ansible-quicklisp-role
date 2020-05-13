@@ -1,8 +1,3 @@
-- name: Include common variables
-  include_vars:
-    file: ../../common/vars/main.yml
-- debug:
-    msg: "User for this Role: {{ user_name }} with home as {{ user_home }}" 
 - name: Ensure a directory exist for the quicklisp sources
   file:
     path: "{{ working_directory }}"
@@ -13,26 +8,26 @@
     dest: "{{ working_directory }}"
 - name: QuickLisp setup
   block:
-    - name: Update quicklisp
+    - name: "Update quicklisp in {{ user_name }} user space"
       command:
       args:
         chdir: "{{ user_home }}/"
         cmd: "sbcl --disable-debugger --eval \"(progn (ql:update-client) (exit))\""
         removes: "{{ user_home }}/quicklisp"
-      become: True
-      become_user: "{{ user_name }}"
-    - name: Install quicklisp client
+      # become: True
+      # become_user: "{{ user_name }}"
+    - name: "Install quicklisp client for user {{ user_name }}"
       command:
       args:
         chdir: "{{ user_home }}/"
         cmd: "sbcl --disable-debugger --load {{ working_directory }}/quicklisp.lisp --eval \"(progn (quicklisp-quickstart:install) (exit))\""
         creates: "{{ user_home }}/quicklisp"
       register: ql_res
-      become: True
-      become_user: "{{ user_name }}"
+      # become: True
+      # become_user: "{{ user_name }}"
     - debug:
         msg: "Content of ql_res: {{ ql_res }}"
-    - name: Initialize Quicklisp
+    - name: "Initialize Quicklisp in {{ user_name }} user space"
       block:
         # It is necessary to patch this file, else, the command in the
         # next task will ask for pressing enter (Ansible doesn't
@@ -47,9 +42,9 @@
           command: "sbcl --disable-debugger --load {{ user_home }}/quicklisp/setup.lisp --eval \"(progn (ql:add-to-init-file) (exit))\""
           args:
             chdir: "{{ user_home }}"
-    - name: Update common lisp packages
+    - name: "Update common lisp packages in {{ user_name }} user space"
       command: 'sbcl --disable-debugger --eval "(progn (ql:update-dist \"quicklisp\") (exit))"'
       args:
         chdir: "{{ user_home }}"
   become: True
-  become_user: user_name
+  become_user: "{{ user_name }}"
